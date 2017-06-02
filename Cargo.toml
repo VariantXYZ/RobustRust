@@ -1,0 +1,6 @@
+[package]
+name = "robust"
+version = "0.1.0"
+authors = ["VariantXYZ <variantxyz@gmail.com>"]
+
+[dependencies]

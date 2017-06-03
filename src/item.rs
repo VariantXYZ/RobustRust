@@ -1,13 +1,14 @@
+#[derive(Copy, Clone)]
 pub struct Item<'a>
 {
-	pub id: u64,
 	pub name: &'a str,
-	pub cat: ItemCategory,
+	pub inf: ItemInfo<'a>,
 }
 
-pub enum ItemCategory
+#[derive(Copy, Clone)]
+pub enum ItemInfo<'a>
 {
-	Consumable { on_use_script: String },
-	Weapon { on_hit_script: String, atk: u64, def: u64, mgc: u64 },
-	Armor { on_hit_script: String, atk: u64, def: u64, mgc: u64 },
+	Consumable { on_use_script: &'a str },
+	Weapon { on_hit_script: &'a str, atk: u16, def: u16, dex: u16, mgc: u16 },
+	Armor { on_hit_script: &'a str, atk: u16, def: u16, dex: u16, mgc: u16 },
 }

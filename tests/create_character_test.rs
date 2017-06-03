@@ -34,17 +34,10 @@ fn create_character()
 	//Get items
 	let itm = item::Item { name: "Potion", inf: item::ItemInfo::Consumable { on_use_script: "Heal 5" } };
 	let wpn = item::Item { name: "Sword", inf: item::ItemInfo::Weapon { on_hit_script: "Fire 1", atk: 2, def: 0, dex: 0, mgc: 0 } };
-	let arm = item::Item { name: "Armor", inf: item::ItemInfo::Armor { on_hit_script: "Ice 1", atk: 0, def: 2, dex: 0, mgc: 0 } };
-	
-	let got_item = char.add_item(itm);
-	assert_eq!(got_item, true);
-	
-	let got_item = char.add_item(wpn);
-	assert_eq!(got_item, true);
-	
-	let got_item = char.add_item(arm);
-	assert_eq!(got_item, true);
-	
+	let arm = item::Item { name: "Armor", inf: item::ItemInfo::Armor { on_hit_script: "Ice 1", atk: 0, def: 2, dex: 0, mgc: 0 } };	
+	assert!(char.inv_add(itm));	
+	assert!(char.inv_add(wpn));	
+	assert!(char.inv_add(arm));	
 	if let item::ItemInfo::Consumable { on_use_script, .. } = char.inv[0].unwrap().inf 
 	{
 		assert_eq!(on_use_script, "Heal 5");
@@ -52,8 +45,7 @@ fn create_character()
 	else
 	{
 		assert!(false);
-	}
-	
+	}	
 	if let item::ItemInfo::Weapon { on_hit_script, atk, def, dex, mgc } = char.inv[1].unwrap().inf 
 	{
 		assert_eq!(on_hit_script, "Fire 1");
@@ -65,8 +57,7 @@ fn create_character()
 	else
 	{
 		assert!(false);
-	}
-	
+	}	
 	if let item::ItemInfo::Armor { on_hit_script, atk, def, dex, mgc } = char.inv[2].unwrap().inf 
 	{
 		assert_eq!(on_hit_script, "Ice 1");
@@ -80,8 +71,20 @@ fn create_character()
 		assert!(false);
 	}
 	
-	//Take items
-	let take_item = char.del_item_by_name("Potion");
+	assert_eq!(char.inv_count(),3);
 	
+	//Take Potion
+	assert!(char.inv_del_by_name("Potion"));
+	assert!(!char.inv_del_by_idx(0));
+	assert!(!char.inv_has_by_name("Potion"));
+	assert!(!char.inv_has_by_idx(0));
 	
+	//Take Sword
+	assert!(char.inv_del_by_idx(1));
+	assert!(!char.inv_del_by_name("Sword"));
+	assert!(!char.inv_has_by_name("Sword"));
+	assert!(!char.inv_has_by_idx(1));
+	
+	//Verify Current Items
+	assert_eq!(char.inv_count(),1);
 }

@@ -13,7 +13,6 @@ pub struct Character<'a>
 	pub dex: u16,
 	pub mgc: u16,
 	
-	//Base Values, growth determined by class
 	pub hp: u16,
 	pub mp: u16,
 	pub atp: u16,
@@ -63,41 +62,40 @@ impl<'a> Character<'a>
 {
 	pub fn level(&self) -> u16 { self.atk + self.def + self.dex + self.mgc }
 
-	pub fn add_item(&mut self, i: item::Item<'a>) -> bool
+	//Inventory Related
+	pub fn inv_max(&self) -> usize { INVENTORY_SIZE }
+	pub fn inv_count(&self) -> usize { self.inv.iter().fold(0, |cnt, &x| if x.is_some() { cnt + 1 } else { cnt } ) }
+	pub fn inv_free_space(&self) -> usize { INVENTORY_SIZE - self.inv_count() }
+	pub fn inv_has_by_idx(&self, idx: usize) -> bool { return self.inv[idx].is_some() }
+	pub fn inv_find_by_name(&self, name: &'a str) -> Option<usize> { return self.inv.iter().position(|r| r.is_some() && r.unwrap().name == name ) }
+	pub fn inv_has_by_name(&self, name: &'a str) -> bool { self.inv_find_by_name(name).is_some() }	
+	
+	pub fn inv_add(&mut self, i: item::Item<'a>) -> bool
 	{
 		let idx = self.inv.iter().position(|r| { r.is_none() });
-		
-		if idx == None
+		match idx
 		{
-			return false;
+			None => false,
+			_ => { self.inv[idx.unwrap()] = Some(i); return true; }
 		}
-		
-		self.inv[idx.unwrap()] = Some(i);
-		return true;
 	}
 	
-	pub fn del_item_by_id(&mut self, id: usize) -> bool
+	pub fn inv_del_by_idx(&mut self, idx: usize) -> bool
 	{
-		if self.inv[id].is_none()
+		let ret_val = idx < 30 && self.inv[idx].is_some();
+		self.inv[idx] = None;
+		return ret_val;
+	}
+
+	
+	pub fn inv_del_by_name(&mut self, name: &'a str) -> bool
+	{
+		let idx = self.inv.iter().position(|r| r.is_some() && r.unwrap().name == name );
+		match idx
 		{
-			return false;
-		}
-		else
-		{
-			self.inv[id] = None;
-			return true;
+			None => false,
+			_ => self.inv_del_by_idx(idx.unwrap())
 		}	
 	}
 	
-	pub fn del_item_by_name(&mut self, id: &'a str) -> bool
-	{
-		let idx = self.inv.iter().position(|r| { r.unwrap().name == id });
-		
-		if idx == None
-		{
-			return false;
-		}
-		self.inv[idx.unwrap()] = None;
-		return true;
-	}
 }

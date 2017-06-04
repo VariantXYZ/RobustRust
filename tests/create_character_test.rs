@@ -32,15 +32,16 @@ fn create_character()
 	assert_eq!(char.level(), 2);
 	
 	//Get items
-	let itm = item::Item { name: "Potion", inf: item::ItemInfo::Consumable { on_use_script: "Heal 5" } };
-	let wpn = item::Item { name: "Sword", inf: item::ItemInfo::Weapon { on_hit_script: "Fire 1", atk: 2, def: 0, dex: 0, mgc: 0 } };
-	let arm = item::Item { name: "Armor", inf: item::ItemInfo::Armor { on_hit_script: "Ice 1", atk: 0, def: 2, dex: 0, mgc: 0 } };	
+	let itm = item::Item { id: 1, name: "Potion", on_use_script: "Heal 5", inf: item::ItemInfo::Stackable { quantity: 1 } };
+	let wpn = item::Item { id: 2, name: "Sword", on_use_script: "", inf: item::ItemInfo::Weapon { on_hit_script: "Fire 1", atk: 2, def: 0, dex: 0, mgc: 0 } };
+	let arm = item::Item { id: 3, name: "Armor", on_use_script: "", inf: item::ItemInfo::Armor { on_def_script: "Ice 1", atk: 0, def: 2, dex: 0, mgc: 0 } };	
 	assert!(char.inv_add(itm));	
 	assert!(char.inv_add(wpn));	
 	assert!(char.inv_add(arm));	
-	if let item::ItemInfo::Consumable { on_use_script, .. } = char.inv[0].unwrap().inf 
+	assert_eq!(char.inv[0].unwrap().on_use_script, "Heal 5");	
+	if let item::ItemInfo::Stackable { quantity, .. } = char.inv[0].unwrap().inf 
 	{
-		assert_eq!(on_use_script, "Heal 5");
+		assert_eq!(quantity, 1);
 	}
 	else
 	{
@@ -58,9 +59,9 @@ fn create_character()
 	{
 		assert!(false);
 	}	
-	if let item::ItemInfo::Armor { on_hit_script, atk, def, dex, mgc } = char.inv[2].unwrap().inf 
+	if let item::ItemInfo::Armor { on_def_script, atk, def, dex, mgc } = char.inv[2].unwrap().inf 
 	{
-		assert_eq!(on_hit_script, "Ice 1");
+		assert_eq!(on_def_script, "Ice 1");
 		assert_eq!(atk, 0);
 		assert_eq!(def, 2);
 		assert_eq!(dex, 0);
@@ -86,5 +87,15 @@ fn create_character()
 	assert!(!char.inv_has_by_idx(1));
 	
 	//Verify Current Items
+	assert!(char.inv_has_by_name("Armor"));
 	assert_eq!(char.inv_count(),1);
+	
+	//Add 3 potions
+	assert!(char.inv_add(itm));
+	assert!(char.inv_add(itm));	
+	assert!(char.inv_add(itm));	
+	if let item::ItemInfo::Stackable { quantity, .. } = char.inv[0].unwrap().inf
+	{
+		assert_eq!(quantity, 3);
+	}
 }
